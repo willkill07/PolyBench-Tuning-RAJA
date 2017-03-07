@@ -37,8 +37,8 @@ static __attribute__ ((noinline)) void kernel_adi(int tsteps, int n, double u[20
       });
       v[n - 1][i] = 1.0;
       RAJA::forall<Pol_Id_2_Size_1_Parent_0>(RAJA::RangeSegment{1, n - 1}, [=] (int jj) {
-	j = n - (jj + 1);
-	v[j][i] = p[i][j] * v[j + 1][i] + q[i][j];
+        int j = n - (jj + 1);
+        v[j][i] = p[i][j] * v[j + 1][i] + q[i][j];
       });
     });
     RAJA::forall<Pol_Id_3_Size_1_Parent_null>(RAJA::RangeSegment{1, n - 1}, [=] (int i) {
@@ -46,12 +46,12 @@ static __attribute__ ((noinline)) void kernel_adi(int tsteps, int n, double u[20
       p[i][0] = 0.0;
       q[i][0] = u[i][0];
       RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{1, n - 1}, [=] (int j) {
-	p[i][j] = -f / (d * p[i][j - 1] + e);
+        p[i][j] = -f / (d * p[i][j - 1] + e);
         q[i][j] = (-a * v[i - 1][j] + (1.0 + 2.0 * a) * v[i][j] - c * v[i + 1][j] - d * q[i][j - 1]) / (d * p[i][j - 1] + e);
       });
       u[i][n - 1] = 1.0;
       RAJA::forall<Pol_Id_5_Size_1_Parent_3>(RAJA::RangeSegment{1, n - 1}, [=] (int jj) {
-	j = n - (jj + 1);
+        int j = n - (jj + 1);
         u[i][j] = p[i][j] * u[i][j + 1] + q[i][j];
       });
     });

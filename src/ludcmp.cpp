@@ -35,14 +35,14 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000], do
 static __attribute__ ((noinline)) void kernel_ludcmp(int n, double A[4000][4000], double b[4000], double x[4000], double y[4000]) {
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int i) {
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int j) {
-      RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type> w(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type, double> w(0);
       RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, i}, [=] (int k) {
         w += A[i][k] * A[k][j];
       });
       A[i][j] = (A[i][j] - w) / A[j][j];
     });
     RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{i, n}, [=] (int j) {
-      RAJA::ReduceSum<typename Reduce<Pol_Id_4_Size_1_Parent_3>::type> w(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_4_Size_1_Parent_3>::type, double> w(0);
       RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{0, i}, [=] (int k) {
         w += A[i][k] * A[k][j];
       });
@@ -50,7 +50,7 @@ static __attribute__ ((noinline)) void kernel_ludcmp(int n, double A[4000][4000]
     });
   });
   RAJA::forall<Pol_Id_5_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int i) {
-    RAJA::ReduceSum<typename Reduce<Pol_Id_6_Size_1_Parent_5>::type> w(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_6_Size_1_Parent_5>::type, double> w(0);
     RAJA::forall<Pol_Id_6_Size_1_Parent_5>(RAJA::RangeSegment{0, i}, [=] (int j) {
       w += A[i][j] * y[j];
     });
@@ -58,7 +58,7 @@ static __attribute__ ((noinline)) void kernel_ludcmp(int n, double A[4000][4000]
   });
   RAJA::forall<Pol_Id_7_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int ii) {
     int i = (n - 1) - ii;
-    RAJA::ReduceSum<typename Reduce<Pol_Id_8_Size_1_Parent_7>::type> w(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_8_Size_1_Parent_7>::type, double> w(0);
     RAJA::forall<Pol_Id_8_Size_1_Parent_7> (RAJA::RangeSegment{i + 1, n}, [=] (int j) {
 	w += A[i][j] * x[j];
     });

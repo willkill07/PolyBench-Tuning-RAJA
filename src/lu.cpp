@@ -29,17 +29,17 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000]) {
 static __attribute__ ((noinline)) void kernel_lu(int n, double A[4000][4000]) {
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int i) {
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int j) {
-      RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type> a(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type, double> a(0);
       RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, j}, [=] (int k) {
-	a += A[i][k] * A[k][j];
+        a += A[i][k] * A[k][j];
       });
       A[i][j] = a / A[j][j];
     });
     RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{i, n}, [=] (int j) {
-      RAJA::ReduceSum<typename Reduce<Pol_Id_4_Size_1_Parent_3>::type> a(0);
-      RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{0, k}, [=] (int k) {
+      RAJA::ReduceSum<typename Reduce<Pol_Id_4_Size_1_Parent_3>::type, double> a(0);
+      RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{0, n}, [=] (int k) {
          a += A[i][k] * A[k][j];
-      })
+      });
       A[i][j] -= a;
     });
   });
