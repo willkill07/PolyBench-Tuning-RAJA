@@ -14,19 +14,18 @@ static __attribute__((noinline)) void init_array(int nr, int nq, int np, double 
 
 void kernel_doitgen(int nr, int nq, int np, double A[250][220][270], double C4[270][270], double sum[270]) {
   int r, q, p, s;
-  for (r = 0; r < nr; r++) {
-    for (q = 0; q < nq; q++) {
-      for (p = 0; p < np; p++) {
-        sum[p] = 0.0;
-        for (s = 0; s < np; s++) {
-          sum[p] += A[r][q][s] * C4[s][p];
-        }
-      }
-      for (p = 0; p < np; p++) {
-        A[r][q][p] = sum[p];
-      }
-    }
-  }
+  RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{0, nr}, RAJA::RangeSegment{0, nq}, [=] (int r, int q) {
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, np}, [=] (int p) {
+      RAJA::ReduceSum<Pol_Id_2_Size_1_Parent_1,double> s(0);
+      RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, np}, [=] (int s) {
+	s += A[r][q][s] * C4[s][p];
+      });
+      sum[p] = s;
+    });
+    RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{0, np}, [=] (int p) {
+      A[r][q][p] = sum[p];
+    });
+  });
 }
 
 int main() {

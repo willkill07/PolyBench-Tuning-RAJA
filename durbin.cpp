@@ -8,29 +8,30 @@ static __attribute__((noinline)) void init_array(int n, double r[4000]) {
 }
 
 static __attribute__ ((noinline)) void kernel_durbin(int n, double r[4000], double y[4000]) {
-  double z[4000];
+  double* z;
+  posix_memalign((void**)&z, 64, (4000) * sizeof(double));
   double alpha;
   double beta;
-  double sum;
-  int i, k;
   y[0] = -r[0];
   beta = 1.0;
   alpha = -r[0];
-  for (k = 1; k < n; k++) {
+
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{1, n}, [=] (int k) {
     beta = (1 - alpha * alpha) * beta;
-    sum = 0.0;
-    for (i = 0; i < k; i++) {
+    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> sum(0);
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, k}, [=] (int i) {
       sum += r[k - i - 1] * y[i];
-    }
+    });
     alpha = -(r[k] + sum) / beta;
-    for (i = 0; i < k; i++) {
+    RAJA::forall<Pol_Id_2_Size_1_Parent_0>(RAJA::RangeSegment{0, k}, [=] (int i) {
       z[i] = y[i] + alpha * y[k - i - 1];
-    }
-    for (i = 0; i < k; i++) {
+    });
+    RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{0, k}, [=] (int i) {
       y[i] = z[i];
-    }
+    });
     y[k] = alpha;
-  }
+  });
+  free (z);
 }
 
 int main() {

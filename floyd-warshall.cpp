@@ -11,13 +11,11 @@ static __attribute__((noinline)) void init_array(int n, int path[5600][5600]) {
 }
 
 static __attribute__ ((noinline)) void kernel_floyd_warshall(int n, int path[5600][5600]) {
-  int i, j, k;
-  for (k = 0; k < n; k++) {
-    for (i = 0; i < n; i++)
-      for (j = 0; j < n; j++)
-        path[i][j] = path[i][j] < path[i][k] + path[k][j] ? path[i][j] : path[i][k] + path[k][j];
-  }
+  RAJA::forallN<Pol_Id_0_Size_3_Parent_Nil>(RAJA::RangeSegment{0, n},RAJA::RangeSegment{0, n},RAJA::RangeSegment{0, n}, [=] (int k, int i, int j) {
+    path[i][j] = path[i][j] < path[i][k] + path[k][j] ? path[i][j] : path[i][k] + path[k][j];
+  });
 }
+
 int main() {
   int n = 5600;
   int(*path)[5600][5600];

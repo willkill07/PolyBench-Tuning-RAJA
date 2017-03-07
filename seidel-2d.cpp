@@ -8,11 +8,9 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000]) {
 }
 
 static __attribute__ ((noinline)) void kernel_seidel_2d(int tsteps, int n, double A[4000][4000]) {
-  int t, i, j;
-  for (t = 0; t <= tsteps - 1; t++)
-    for (i = 1; i <= n - 2; i++)
-      for (j = 1; j <= n - 2; j++)
-        A[i][j] = (A[i - 1][j - 1] + A[i - 1][j] + A[i - 1][j + 1] + A[i][j - 1] + A[i][j] + A[i][j + 1] + A[i + 1][j - 1] + A[i + 1][j] + A[i + 1][j + 1]) / 9.0;
+  RAJA::forallN<Pol_Id_0_Size_3_Parent_Nil>(RAJA::RangeSegment{0, tsteps}, RAJA::RangeSegment{1, n - 1}, RAJA::RangeSegment{1, n - 1}, [=] (int, int i, int j) {
+    A[i][j] = (A[i - 1][j - 1] + A[i - 1][j] + A[i - 1][j + 1] + A[i][j - 1] + A[i][j] + A[i][j + 1] + A[i + 1][j - 1] + A[i + 1][j] + A[i + 1][j + 1]) / 9.0;
+  });
 }
 
 int main() {

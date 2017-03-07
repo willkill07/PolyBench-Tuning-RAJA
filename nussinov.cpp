@@ -13,9 +13,9 @@ static __attribute__((noinline)) void init_array(int n, base seq[5500], int tabl
 }
 
 static __attribute__ ((noinline)) void kernel_nussinov(int n, base seq[5500], int table[5500][5500]) {
-  int i, j, k;
-  for (i = n - 1; i >= 0; i--) {
-    for (j = i + 1; j < n; j++) {
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int ii) {
+    int i = (n - 1) - ii;
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{i + 1, n}, [=] (int j) {
       if (j - 1 >= 0)
         table[i][j] = ((table[i][j] >= table[i][j - 1]) ? table[i][j] : table[i][j - 1]);
       if (i + 1 < n)
@@ -26,11 +26,11 @@ static __attribute__ ((noinline)) void kernel_nussinov(int n, base seq[5500], in
         else
           table[i][j] = ((table[i][j] >= table[i + 1][j - 1]) ? table[i][j] : table[i + 1][j - 1]);
       }
-      for (k = i + 1; k < j; k++) {
+      RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{i + 1, j}, [=] (int k) {
         table[i][j] = ((table[i][j] >= table[i][k] + table[k + 1][j]) ? table[i][j] : table[i][k] + table[k + 1][j]);
-      }
-    }
-  }
+      });
+    });
+  });
 }
 
 int main() {

@@ -14,16 +14,14 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
 }
 
 static __attribute__ ((noinline)) void kernel_gesummv(int n, double alpha, double beta, double A[2800][2800], double B[2800][2800], double tmp[2800], double x[2800], double y[2800]) {
-  int i, j;
-  for (i = 0; i < n; i++) {
-    tmp[i] = 0.0;
-    y[i] = 0.0;
-    for (j = 0; j < n; j++) {
-      tmp[i] = A[i][j] * x[j] + tmp[i];
-      y[i] = B[i][j] * x[j] + y[i];
-    }
-    y[i] = alpha * tmp[i] + beta * y[i];
-  }
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int i) {
+    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> t(0), yy(0);
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, n}, [=] (int j) {
+      t += A[i][j] * x[j];
+      yy += B[i][j] * x[j];
+    });
+    y[i] = alpha * t + beta * yy;
+  });
 }
 
 int main() {

@@ -14,6 +14,8 @@
 #include <memory>
 #include <chrono>
 
+#include <RAJA/RAJA.hxx>
+
 template <typename Clock = std::chrono::steady_clock>
 class Timer {
   std::chrono::time_point<Clock> begin, end;

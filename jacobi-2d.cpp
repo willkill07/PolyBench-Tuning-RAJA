@@ -10,14 +10,13 @@ static __attribute__((noinline)) void init_array(int n, double A[2800][2800], do
 }
 
 static __attribute__ ((noinline)) void kernel_jacobi_2d(int tsteps, int n, double A[2800][2800], double B[2800][2800]) {
-  int t, i, j;
-  for (t = 0; t < tsteps; t++) {
-    for (i = 1; i < n - 1; i++)
-      for (j = 1; j < n - 1; j++)
-        B[i][j] = 0.2 * (A[i][j] + A[i][j - 1] + A[i][1 + j] + A[1 + i][j] + A[i - 1][j]);
-    for (i = 1; i < n - 1; i++)
-      for (j = 1; j < n - 1; j++)
-        A[i][j] = 0.2 * (B[i][j] + B[i][j - 1] + B[i][1 + j] + B[1 + i][j] + B[i - 1][j]);
+  for (int t = 0; t < tsteps; t++) {
+    RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{1, n - 1}, RAJA::RangeSegment{1, n - 1}, [=] (int i, int j) {
+      B[i][j] = 0.2 * (A[i][j] + A[i][j - 1] + A[i][1 + j] + A[1 + i][j] + A[i - 1][j]);
+    });
+    RAJA::forallN<Pol_Id_1_Size_2_Parent_Nil>(RAJA::RangeSegment{1, n - 1}, RAJA::RangeSegment{1, n - 1}, [=] (int i, int j) {
+      A[i][j] = 0.2 * (B[i][j] + B[i][j - 1] + B[i][1 + j] + B[1 + i][j] + B[i - 1][j]);
+    });
   }
 }
 

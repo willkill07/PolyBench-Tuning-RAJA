@@ -9,12 +9,13 @@ static __attribute__((noinline)) void init_array(int n, double A[4000], double B
 }
 
 static __attribute__ ((noinline)) void kernel_jacobi_1d(int tsteps, int n, double A[4000], double B[4000]) {
-  int t, i;
-  for (t = 0; t < tsteps; t++) {
-    for (i = 1; i < n - 1; i++)
+  for (int t = 0; t < tsteps; t++) {
+    RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{1, n - 1}, [=] (int i) {
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
-    for (i = 1; i < n - 1; i++)
+    });
+    RAJA::forall<Pol_Id_1_Size_1_Parent_Nil>(RAJA::RangeSegment{1, n - 1}, [=] (int i) {
       A[i] = 0.33333 * (B[i - 1] + B[i] + B[i + 1]);
+    });
   }
 }
 

@@ -29,18 +29,18 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000]) {
 
 static __attribute__ ((noinline)) void kernel_cholesky(int n, double A[4000][4000]) {
   int i, j, k;
-  for (i = 0; i < n; i++) {
-    for (j = 0; j < i; j++) {
-      for (k = 0; k < j; k++) {
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int i) {
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int j) {
+      RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, j}, [=] (int k) {
         A[i][j] -= A[i][k] * A[j][k];
-      }
+      });
       A[i][j] /= A[j][j];
-    }
-    for (k = 0; k < i; k++) {
+    });
+    RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{0,i}, [=] (int k) {
       A[i][i] -= A[i][k] * A[i][k];
-    }
+    });
     A[i][i] = sqrt(A[i][i]);
-  }
+  });
 }
 
 int main() {

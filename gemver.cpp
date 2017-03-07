@@ -20,18 +20,18 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
 }
 
 static __attribute__ ((noinline)) void kernel_gemver(int n, double alpha, double beta, double A[4000][4000], double u1[4000], double v1[4000], double u2[4000], double v2[4000], double w[4000], double x[4000], double y[4000], double z[4000]) {
-  int i, j;
-  for (i = 0; i < n; i++)
-    for (j = 0; j < n; j++)
-      A[i][j] = A[i][j] + u1[i] * v1[j] + u2[i] * v2[j];
-  for (i = 0; i < n; i++)
-    for (j = 0; j < n; j++)
-      x[i] = x[i] + beta * A[j][i] * y[j];
-  for (i = 0; i < n; i++)
+  RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{0, n}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
+    A[i][j] = A[i][j] + u1[i] * v1[j] + u2[i] * v2[j];
+  });
+  RAJA::forallN<Pol_Id_1_Size_2_Parent_Nil>(RAJA::RangeSegment{0, n}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
+    x[i] = x[i] + beta * A[j][i] * y[j];
+  });
+  RAJA::forall<Pol_Id_2_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int i) {
     x[i] = x[i] + z[i];
-  for (i = 0; i < n; i++)
-    for (j = 0; j < n; j++)
-      w[i] = w[i] + alpha * A[i][j] * x[j];
+  });
+  RAJA::forallN<Pol_Id_3_Size_2_Parent_Nil>(RAJA::RangeSegment{0, n}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
+    w[i] = w[i] + alpha * A[i][j] * x[j];
+  });
 }
 
 int main() {

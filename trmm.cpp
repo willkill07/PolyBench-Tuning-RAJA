@@ -15,13 +15,13 @@ static __attribute__((noinline)) void init_array(int m, int n, double *alpha, do
 }
 
 static __attribute__ ((noinline)) void kernel_trmm(int m, int n, double alpha, double A[2000][2000], double B[2000][2600]) {
-  int i, j, k;
-  for (i = 0; i < m; i++)
-    for (j = 0; j < n; j++) {
-      for (k = i + 1; k < m; k++)
-        B[i][j] += A[k][i] * B[k][j];
-      B[i][j] = alpha * B[i][j];
-    }
+  RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{0, m}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
+    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> b(B[i][j]);
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{i + 1, m}, [=] (int k) {
+      b += A[k][i] * B[k][j];
+    });
+    B[i][j] = alpha * b;
+  });
 }
 
 int main() {

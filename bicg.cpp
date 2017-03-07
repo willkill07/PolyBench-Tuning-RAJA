@@ -12,16 +12,17 @@ static __attribute__((noinline)) void init_array(int m, int n, double A[2200][18
 }
 
 static __attribute__ ((noinline)) void kernel_bicg(int m, int n, double A[2200][1800], double s[1800], double q[2200], double p[1800], double r[2200]) {
-  int i, j;
-  for (i = 0; i < m; i++)
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, m}, [=] (int i) {
     s[i] = 0;
-  for (i = 0; i < n; i++) {
-    q[i] = 0.0;
-    for (j = 0; j < m; j++) {
+  });
+  RAJA::forall<Pol_Id_1_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int i) {
+    RAJA::ReduceSum<Pol_Id_2_Size_1_Parent_1, double> qq(0);
+    RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, m}, [=] (int j) {
       s[j] = s[j] + r[i] * A[i][j];
-      q[i] = q[i] + A[i][j] * p[j];
-    }
-  }
+      qq + A[i][j] * p[j];
+    });
+    q[i] = qq;
+  });
 }
 
 int main() {

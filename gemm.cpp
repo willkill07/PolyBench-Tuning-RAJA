@@ -16,15 +16,12 @@ static __attribute__((noinline)) void init_array(int ni, int nj, int nk, double 
 }
 
 static __attribute__ ((noinline)) void kernel_gemm(int ni, int nj, int nk, double alpha, double beta, double C[2000][2300], double A[2000][2600], double B[2600][2300]) {
-  int i, j, k;
-  for (i = 0; i < ni; i++) {
-    for (j = 0; j < nj; j++)
-      C[i][j] *= beta;
-    for (k = 0; k < nk; k++) {
-      for (j = 0; j < nj; j++)
-        C[i][j] += alpha * A[i][k] * B[k][j];
-    }
-  }
+  RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{0, ni}, RAJA::RangeSegment{0, nj}, [=] (int i, int j) {
+    C[i][j] *= beta;
+  });
+  RAJA::forallN<Pol_Id_1_Size_3_Parent_Nil>(RAJA::RangeSegment{0, ni}, RAJA::RangeSegment{0, nk}, RAJA::RangeSegment{0, nj}, [=] (int i, int k, int j) {
+    C[i][j] += alpha * A[i][k] * B[k][j];
+  });
 }
 
 int main() {

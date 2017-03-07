@@ -13,23 +13,25 @@ static __attribute__((noinline)) void init_array(int m, int n, double A[2000][26
 }
 
 static __attribute__ ((noinline)) void kernel_gramschmidt(int m, int n, double A[2000][2600], double R[2600][2600], double Q[2000][2600]) {
-  int i, j, k;
-  double nrm;
-  for (k = 0; k < n; k++) {
-    nrm = 0.0;
-    for (i = 0; i < m; i++)
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int k) {
+    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> nrm(0);
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, m}, [=] (int i) {
       nrm += A[i][k] * A[i][k];
+    });
     R[k][k] = sqrt(nrm);
-    for (i = 0; i < m; i++)
+    RAJA::forall<Pol_Id_2_Size_1_Parent_0>(RAJA::RangeSegment{0, m}, [=] (int i) {
       Q[i][k] = A[i][k] / R[k][k];
-    for (j = k + 1; j < n; j++) {
-      R[k][j] = 0.0;
-      for (i = 0; i < m; i++)
-        R[k][j] += Q[i][k] * A[i][j];
-      for (i = 0; i < m; i++)
-        A[i][j] = A[i][j] - Q[i][k] * R[k][j];
-    }
-  }
+    });
+    RAJA::forall<Pol_Id_3_Size_1_Parent_0>(RAJA::RangeSegment{k + 1, n}, [=] (int j) {
+      RAJA::ReduceSum<Pol_Id_4_Size_1_Parent_3, double> r(0);
+      RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{0, m}, [=] (int i) {
+	r += Q[i][k] * A[i][j];
+      });
+      RAJA::forall<Pol_Id_5_Size_1_Parent_3>(RAJA::RangeSegment{0, m}, [=] (int i) {
+        A[i][j] = A[i][j] - Q[i][k] * r;
+      });
+    });
+  });
 }
 
 int main() {

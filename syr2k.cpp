@@ -16,15 +16,14 @@ static __attribute__((noinline)) void init_array(int n, int m, double *alpha, do
 }
 
 static __attribute__ ((noinline)) void kernel_syr2k(int n, int m, double alpha, double beta, double C[2600][2600], double A[2600][2000], double B[2600][2000]) {
-  int i, j, k;
-  for (i = 0; i < n; i++) {
-    for (j = 0; j <= i; j++)
+  RAJA::forallN<Pol_Id_0_Size_2_Parent_Nil>(RAJA::RangeSegment{0, n}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
+    if (j <= i)
       C[i][j] *= beta;
-    for (k = 0; k < m; k++)
-      for (j = 0; j <= i; j++) {
-        C[i][j] += A[j][k] * alpha * B[i][k] + B[j][k] * alpha * A[i][k];
-      }
-  }
+  });
+  RAJA::forallN<Pol_Id_1_Size_3_Parent_Nil>(RAJA::RangeSegment{0, n}, RAJA::RangeSegment{0, m}, RAJA::RangeSegment{0, n}, [=] (int i, int k, int j) {
+    if (j <= i)
+      C[i][j] += A[j][k] * alpha * B[i][k] + B[j][k] * alpha * A[i][k];
+  });
 }
 
 int main() {

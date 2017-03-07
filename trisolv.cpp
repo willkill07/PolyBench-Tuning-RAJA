@@ -10,14 +10,14 @@ static __attribute__((noinline)) void init_array(int n, double L[4000][4000], do
   }
 }
 
-static __attribute__ ((noinline)) void kernel_trisolv(int n, double L[4000][4000], double x[4000], double b[4000]) {
-  int i, j;
-  for (i = 0; i < n; i++) {
-    x[i] = b[i];
-    for (j = 0; j < i; j++)
-      x[i] -= L[i][j] * x[j];
-    x[i] = x[i] / L[i][i];
-  }
+static __attribute__((noinline)) void kernel_trisolv(int n, double L[4000][4000], double x[4000], double b[4000]) {
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, n}, [=] (int i) {
+    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> xx(0);
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int j) {
+      xx += L[i][j] * x[j];
+    });
+    x[i] = (x[i] - xx) / L[i][i];
+  });
 }
 
 int main() {

@@ -25,64 +25,62 @@ static __attribute__ ((noinline)) void kernel_deriche(int w, int h, float alpha,
   b1 = powf(2.0f, -alpha);
   b2 = -expf(-2.0f * alpha);
   c1 = c2 = 1;
-  for (i = 0; i < w; i++) {
+  RAJA::forall<Pol_Id_0_Size_1_Parent_Nil>(RAJA::RangeSegment{0, w}, [=] (int i) {
     ym1 = 0.0f;
     ym2 = 0.0f;
     xm1 = 0.0f;
-    for (j = 0; j < h; j++) {
+    RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, h}, [=] (int j) {
       y1[i][j] = a1 * imgIn[i][j] + a2 * xm1 + b1 * ym1 + b2 * ym2;
       xm1 = imgIn[i][j];
       ym2 = ym1;
       ym1 = y1[i][j];
-    }
-  }
-  for (i = 0; i < w; i++) {
+    });
+  });
+  RAJA::forall<Pol_Id_2_Size_1_Parent_Nil>(RAJA::RangeSegment{0, w}, [=] (int i) {
     yp1 = 0.0f;
     yp2 = 0.0f;
     xp1 = 0.0f;
     xp2 = 0.0f;
-    for (j = h - 1; j >= 0; j--) {
+    RAJA::forall<Pol_Id_3_Size_1_Parent_2>(RAJA::RangeSegment{0, h}, [=] (int jj) {
+      int j = h - (jj + 1);
       y2[i][j] = a3 * xp1 + a4 * xp2 + b1 * yp1 + b2 * yp2;
       xp2 = xp1;
       xp1 = imgIn[i][j];
       yp2 = yp1;
       yp1 = y2[i][j];
-    }
-  }
-  for (i = 0; i < w; i++) {
-    for (j = 0; j < h; j++) {
-      imgOut[i][j] = c1 * (y1[i][j] + y2[i][j]);
-    }
-  }
-  for (j = 0; j < h; j++) {
+    });
+  });
+  RAJA::forallN<Pol_Id_4_Size_2_Parent_Nil>(RAJA::RangeSegment{0, w}, RAJA::RangeSegment{0, h}, [=] (int i, int j) {
+    imgOut[i][j] = c1 * (y1[i][j] + y2[i][j]);
+  });
+  RAJA::forall<Pol_Id_5_Size_1_Parent_Nil>(RAJA::RangeSegment{0, h}, [=] (int j) {
     tm1 = 0.0f;
     ym1 = 0.0f;
     ym2 = 0.0f;
-    for (i = 0; i < w; i++) {
+    RAJA::forall<Pol_Id_6_Size_1_Parent_5>(RAJA::RangeSegment{0, w}, [=] (int i) {
       y1[i][j] = a5 * imgOut[i][j] + a6 * tm1 + b1 * ym1 + b2 * ym2;
       tm1 = imgOut[i][j];
       ym2 = ym1;
       ym1 = y1[i][j];
-    }
-  }
-  for (j = 0; j < h; j++) {
+    });
+  });
+  RAJA::forall<Pol_Id_7_Size_1_Parent_Nil>(RAJA::RangeSegment{0, h}, [=] (int j) {
     tp1 = 0.0f;
     tp2 = 0.0f;
     yp1 = 0.0f;
     yp2 = 0.0f;
-    for (i = w - 1; i >= 0; i--) {
+    RAJA::forall<Pol_Id_8_Size_1_Parent_7>(RAJA::RangeSegment{0, w}, [=] (int ii) {
+      int i = w - (ii + 1);
       y2[i][j] = a7 * tp1 + a8 * tp2 + b1 * yp1 + b2 * yp2;
       tp2 = tp1;
       tp1 = imgOut[i][j];
       yp2 = yp1;
       yp1 = y2[i][j];
-    }
-  }
-  for (i = 0; i < w; i++) {
-    for (j = 0; j < h; j++) {
-      imgOut[i][j] = c2 * (y1[i][j] + y2[i][j]);
-    }
-  }
+    });
+  });
+  RAJA::forallN<Pol_Id_9_Size_2_Parent_Nil>(RAJA::RangeSegment{0, w}, RAJA::RangeSegment{0, h}, [=] (int i, int j) {
+    imgOut[i][j] = c2 * (y1[i][j] + y2[i][j]);
+  });
 }
 
 int main() {
