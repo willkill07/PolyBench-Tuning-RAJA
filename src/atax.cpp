@@ -16,7 +16,7 @@ static __attribute__ ((noinline)) void kernel_atax(int m, int n, double A[1800][
     y[i] = 0;
   });
   RAJA::forall<Pol_Id_1_Size_1_Parent_null>(RAJA::RangeSegment{0, m}, [=] (int i) {
-    RAJA::ReduceSum<Pol_Id_2_Size_1_Parent_1, double> t(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type> t(0);
     RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, n}, [=] (int j) {
 	t += A[i][j] * x[j];
     });

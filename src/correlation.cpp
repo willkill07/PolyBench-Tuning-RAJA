@@ -11,14 +11,14 @@ static __attribute__((noinline)) void init_array(int m, int n, double *float_n, 
 static __attribute__ ((noinline)) void kernel_correlation(int m, int n, double float_n, double data[3000][2600], double corr[2600][2600], double mean[2600], double stddev[2600]) {
   double eps = 0.1;
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{0, m}, [=] (int j) {
-    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> mn(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type> mn(0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, n}, [=] (int i) {
       mn += data[i][j];
     });
     mean[j] = mn / float_n;
   });
   RAJA::forall<Pol_Id_2_Size_1_Parent_null>(RAJA::RangeSegment{0, m}, [=] (int j) {
-    RAJA::ReduceSum<Pol_Id_3_Size_1_Parent_2, double> stdv(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_3_Size_1_Parent_2>::type> stdv(0);
     RAJA::forall<Pol_Id_3_Size_1_Parent_2>(RAJA::RangeSegment{0, n}, [=] (int i) {
       stdv += (data[i][j] - mean[j]) * (data[i][j] - mean[j]);
     });
@@ -33,7 +33,7 @@ static __attribute__ ((noinline)) void kernel_correlation(int m, int n, double f
   RAJA::forall<Pol_Id_5_Size_1_Parent_null>(RAJA::RangeSegment{0, m - 1}, [=] (int i) {
     corr[i][i] = 1.0;
     RAJA::forall<Pol_Id_6_Size_1_Parent_5>(RAJA::RangeSegment{i + 1, m}, [=] (int j) {
-      RAJA::ReduceSum<Pol_Id_7_Size_1_Parent_6, double> cr(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_7_Size_1_Parent_6>::type> cr(0);
       RAJA::forall<Pol_Id_7_Size_1_Parent_6>(RAJA::RangeSegment{0, n}, [=] (int k) {
         cr += (data[k][i] * data[k][j]);
       });

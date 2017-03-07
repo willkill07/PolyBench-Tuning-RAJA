@@ -18,7 +18,7 @@ static __attribute__ ((noinline)) void kernel_durbin(int n, double r[4000], doub
 
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{1, n}, [=] (int k) {
     beta = (1 - alpha * alpha) * beta;
-    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> sum(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type> sum(0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, k}, [=] (int i) {
       sum += r[k - i - 1] * y[i];
     });

@@ -12,7 +12,7 @@ static __attribute__((noinline)) void init_array(int n, double L[4000][4000], do
 
 static __attribute__((noinline)) void kernel_trisolv(int n, double L[4000][4000], double x[4000], double b[4000]) {
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int i) {
-    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> xx(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type> xx(0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int j) {
       xx += L[i][j] * x[j];
     });

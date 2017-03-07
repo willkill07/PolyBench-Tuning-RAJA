@@ -16,6 +16,49 @@
 
 #include <RAJA/RAJA.hxx>
 
+#ifndef AUTOTUNING
+
+using Pol_Id_0_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_1_Size_1_Parent_0 = RAJA::seq_exec;
+using Pol_Id_1_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_2_Size_1_Parent_0 = RAJA::seq_exec;
+using Pol_Id_2_Size_1_Parent_1 = RAJA::seq_exec;
+using Pol_Id_2_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_3_Size_1_Parent_0 = RAJA::seq_exec;
+using Pol_Id_3_Size_1_Parent_1 = RAJA::seq_exec;
+using Pol_Id_3_Size_1_Parent_2 = RAJA::seq_exec;
+using Pol_Id_3_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_4_Size_1_Parent_3 = RAJA::seq_exec;
+using Pol_Id_5_Size_1_Parent_3 = RAJA::seq_exec;
+using Pol_Id_5_Size_1_Parent_4 = RAJA::seq_exec;
+using Pol_Id_5_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_6_Size_1_Parent_5 = RAJA::seq_exec;
+using Pol_Id_7_Size_1_Parent_6 = RAJA::seq_exec;
+using Pol_Id_7_Size_1_Parent_null = RAJA::seq_exec;
+using Pol_Id_8_Size_1_Parent_7 = RAJA::seq_exec;
+
+using Pol_Id_0_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_1_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_2_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_3_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_4_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_9_Size_2_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec>>;
+
+using Pol_Id_0_Size_3_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec,RAJA::seq_exec>>;
+using Pol_Id_1_Size_3_Parent_null = RAJA::NestedPolicy<RAJA::ExecList<RAJA::seq_exec,RAJA::seq_exec,RAJA::seq_exec>>;
+
+#endif
+
+template <typename T>
+struct Reduce {
+  using type = RAJA::seq_reduce;
+};
+
+template <>
+struct Reduce<RAJA::omp_parallel_for_exec> {
+  using type = RAJA::omp_reduce;
+};
+
 template <typename Clock = std::chrono::steady_clock>
 class Timer {
   std::chrono::time_point<Clock> begin, end;

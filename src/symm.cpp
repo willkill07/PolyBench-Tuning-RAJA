@@ -19,7 +19,7 @@ static __attribute__((noinline)) void init_array(int m, int n, double *alpha, do
 
 static __attribute__ ((noinline)) void kernel_symm(int m, int n, double alpha, double beta, double C[2000][2600], double A[2000][2000], double B[2000][2600]) {
   RAJA::forallN<Pol_Id_0_Size_2_Parent_null>(RAJA::RangeSegment{0, m}, RAJA::RangeSegment{0, n}, [=] (int i, int j) {
-    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> temp2(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type> temp2(0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, i}, [=] (int k) {
       C[k][j] += alpha * B[i][j] * A[i][k];
       temp2 += B[k][j] * A[i][k];

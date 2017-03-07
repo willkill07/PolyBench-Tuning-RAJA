@@ -10,7 +10,7 @@ static __attribute__((noinline)) void init_array(int m, int n, double *float_n, 
 
 static __attribute__ ((noinline)) void kernel_covariance(int m, int n, double float_n, double data[3000][2600], double cov[2600][2600], double mean[2600]) {
   RAJA::forall<Pol_Id_0_Size_1_Parent_null>(RAJA::RangeSegment{0, m}, [=] (int j) {
-    RAJA::ReduceSum<Pol_Id_1_Size_1_Parent_0, double> mn (0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type> mn (0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, n}, [=] (int i) {
       mn += data[i][j];
     });
@@ -21,7 +21,7 @@ static __attribute__ ((noinline)) void kernel_covariance(int m, int n, double fl
   });
   RAJA::forallN<Pol_Id_3_Size_2_Parent_null>(RAJA::RangeSegment{0, m}, RAJA::RangeSegment{0, m}, [=] (int i, int j) {
     if (j >= i) {
-      RAJA::ReduceSum<Pol_Id_4_Size_1_Parent_3, double> local_cov(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_4_Size_1_Parent_3>::type> local_cov(0);
       RAJA::forall<Pol_Id_4_Size_1_Parent_3>(RAJA::RangeSegment{0, n}, [=] (int k) {
         local_cov += data[k][i] * data[k][j];
       });

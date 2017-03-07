@@ -16,7 +16,7 @@ void kernel_doitgen(int nr, int nq, int np, double A[250][220][270], double C4[2
   int r, q, p, s;
   RAJA::forallN<Pol_Id_0_Size_2_Parent_null>(RAJA::RangeSegment{0, nr}, RAJA::RangeSegment{0, nq}, [=] (int r, int q) {
     RAJA::forall<Pol_Id_1_Size_1_Parent_0>(RAJA::RangeSegment{0, np}, [=] (int p) {
-      RAJA::ReduceSum<Pol_Id_2_Size_1_Parent_1,double> s(0);
+      RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1,double> s(0);
       RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, np}, [=] (int s) {
 	s += A[r][q][s] * C4[s][p];
       });

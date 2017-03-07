@@ -16,7 +16,7 @@ static __attribute__ ((noinline)) void kernel_bicg(int m, int n, double A[2200][
     s[i] = 0;
   });
   RAJA::forall<Pol_Id_1_Size_1_Parent_null>(RAJA::RangeSegment{0, n}, [=] (int i) {
-    RAJA::ReduceSum<Pol_Id_2_Size_1_Parent_1, double> qq(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type> qq(0);
     RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, m}, [=] (int j) {
       s[j] = s[j] + r[i] * A[i][j];
       qq + A[i][j] * p[j];
