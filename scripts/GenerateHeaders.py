@@ -63,7 +63,7 @@ def prettyPrintPolicy(pol):
         return pol[0][0]
     execList = 'RAJA::ExecList<'+','.join(pol[0])+'>'
     tileList = 'RAJA::TileList<'+','.join(pol[1])+'>'
-    perm = 'RAJA::VarOps::index_sequence<' + ','.join(str(x) for x in pol[2]) + '>'
+    perm = 'RAJA::Permute<VarOps::index_sequence<' + ','.join(str(x) for x in pol[2]) + '>>'
     outerTile = 'RAJA::Tile<' + tileList + ',' + perm + '>'
     if "omp" in str(pol[0]):
         outerTile = 'RAJA::OMP_Parallel<' + outerTile + '>'

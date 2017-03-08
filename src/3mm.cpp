@@ -25,14 +25,14 @@ static __attribute__ ((noinline)) void kernel_3mm(int ni, int nj, int nk, int nl
     E[i][j] = e;
   });
   RAJA::forallN<Pol_Id_2_Size_2_Parent_null> (RAJA::RangeSegment{0, nj}, RAJA::RangeSegment{0, nl}, [=] (int i, int j) {
-    RAJA::ReduceSum<typename Reduce<Pol_Id_3_Size_1_Parent_0>::type, double> f(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_3_Size_1_Parent_2>::type, double> f(0);
     RAJA::forall<Pol_Id_3_Size_1_Parent_2> (RAJA::RangeSegment{0, nm}, [=] (int k) {
       f += C[i][k] * D[k][j];
     });
     F[i][j] = f;
   });
   RAJA::forallN<Pol_Id_4_Size_2_Parent_null> (RAJA::RangeSegment{0, ni}, RAJA::RangeSegment{0, nl}, [=] (int i, int j) {
-    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type, double> g(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_5_Size_1_Parent_4>::type, double> g(0);
     RAJA::forall<Pol_Id_5_Size_1_Parent_4> (RAJA::RangeSegment{0, nm}, [=] (int k) {
       g += E[i][k] * F[k][j];
     });
