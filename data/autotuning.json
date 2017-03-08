@@ -1,36 +1,28 @@
 {
-  "data": [
+  "data" : [
     null,
-    {"policies": ["RAJA::seq_exec", "RAJA::simd_exec", "RAJA::omp_parallel_for_exec"]},
-    {
-      "policies":
-      ["RAJA::seq_exec", "RAJA::simd_exec", "RAJA::omp_collapse_nowait_exec", "RAJA::omp_parallel_for_exec"],
-      "tiles": [
-        "RAJA::tile_none",
-        "RAJA::tile_fixed<8>",
-        "RAJA::tile_fixed<32>",
-        "RAJA::tile_fixed<64>",
-        "RAJA::tile_fixed<128>"
+    {"policies": ["RAJA::simd_exec", "RAJA::omp_parallel_for_exec"]}, {
+      "policies": [
+        "RAJA::simd_exec", "RAJA::omp_collapse_nowait_exec", "RAJA::omp_for_nowait_exec"
       ],
-      "permute": ["RAJA::VarOps::index_sequence<0,1>", "RAJA::VarOps::index_sequence<1,0>"]
+      "tiles": [
+        "RAJA::tile_none", "RAJA::tile_fixed<8>", "RAJA::tile_fixed<32>"
+      ]
     },
     {
-      "policies":
-      ["RAJA::seq_exec", "RAJA::simd_exec", "RAJA::omp_collapse_nowait_exec", "RAJA::omp_parallel_for_exec"],
-      "tiles": [
-        "RAJA::tile_none",
-        "RAJA::tile_fixed<8>",
-        "RAJA::tile_fixed<32>",
-        "RAJA::tile_fixed<64>",
-        "RAJA::tile_fixed<128>"
+      "policies": [
+        "RAJA::simd_exec", "RAJA::omp_collapse_nowait_exec", "RAJA::omp_for_nowait_exec"
       ],
-      "permute": [
-        "RAJA::VarOps::index_sequence<0,1,2>",
-        "RAJA::VarOps::index_sequence<1,0,2>",
-        "RAJA::VarOps::index_sequence<1,2,0>",
-        "RAJA::VarOps::index_sequence<2,1,0>",
-        "RAJA::VarOps::index_sequence<2,0,1>",
-        "RAJA::VarOps::index_sequence<0,2,1>"
+      "tiles": [
+        "RAJA::tile_none", "RAJA::tile_fixed<8>", "RAJA::tile_fixed<32>"
+      ]
+    },
+    {
+      "policies": [
+        "RAJA::simd_exec", "RAJA::omp_collapse_nowait_exec", "RAJA::omp_for_nowait_exec"
+      ],
+      "tiles": [
+        "RAJA::tile_none", "RAJA::tile_fixed<8>", "RAJA::tile_fixed<32>"
       ]
     }
   ]

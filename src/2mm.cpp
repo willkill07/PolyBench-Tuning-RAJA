@@ -20,7 +20,7 @@ static __attribute__((noinline)) void init_array(int ni, int nj, int nk, int nl,
 
 static __attribute__((noinline)) void kernel_2mm(int ni, int nj, int nk, int nl, double alpha, double beta, double tmp[1600][1800], double A[1600][2200], double B[2200][1800], double C[1800][2400], double D[1600][2400]) {
   RAJA::forallN<Pol_Id_0_Size_2_Parent_null> (RAJA::RangeSegment{0, ni}, RAJA::RangeSegment{0, nj}, [=] (int i, int j) {
-      RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type, double> t(0);
+    RAJA::ReduceSum<typename Reduce<Pol_Id_1_Size_1_Parent_0>::type, double> t(0);
     RAJA::forall<Pol_Id_1_Size_1_Parent_0> (RAJA::RangeSegment{0, nk}, [=] (int k) {
       t += alpha * A[i][k] * B[k][j];
     });

@@ -42,7 +42,7 @@ int main() {
   t.stop();
   dumpTime(t.timeInSeconds());
 
-  dump("C", &(*C)[0], n);
+  dump("C", &(*C)[0][0], n * n);
 
   free((void *)C);
   free((void *)A);
