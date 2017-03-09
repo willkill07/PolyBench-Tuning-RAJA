@@ -14,7 +14,7 @@ static __attribute__ ((noinline)) void kernel_heat_3d(int tsteps, int n, double 
     RAJA::forallN<Pol_Id_0_Size_3_Parent_null>(RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1}, [=] (int i, int j, int k) {
       B[i][j][k] = 0.125 * (A[i + 1][j][k] - 2.0 * A[i][j][k] + A[i - 1][j][k])+ 0.125 * (A[i][j + 1][k] - 2.0 * A[i][j][k] + A[i][j - 1][k])+ 0.125 * (A[i][j][k + 1] - 2.0 * A[i][j][k] + A[i][j][k - 1]) + A[i][j][k];
     });
-    RAJA::forallN<Pol_Id_1_Size_3_Parent_null>(RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1}, [=] (int i, int j, int k) {
+    RAJA::forallN<Pol_Id_0_Size_3_Parent_null>(RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1},RAJA::RangeSegment{1,n-1}, [=] (int i, int j, int k) {
       A[i][j][k] = 0.125 * (B[i + 1][j][k] - 2.0 * B[i][j][k] + B[i - 1][j][k])+ 0.125 * (B[i][j + 1][k] - 2.0 * B[i][j][k] + B[i][j - 1][k])+ 0.125 * (B[i][j][k + 1] - 2.0 * B[i][j][k] + B[i][j][k - 1]) + B[i][j][k];
     });
   }
