@@ -2,9 +2,15 @@
 
 static __attribute__((noinline)) void init_array(int n, double r[4000]) {
   int i;
+
+  if (load_init("r", r, n))
+    return;
+
   for (i = 0; i < n; i++) {
     r[i] = (n + 1 - i);
   }
+
+  dump_init("r", r, n);
 }
 
 static __attribute__ ((noinline)) void kernel_durbin(int n, double r[4000], double y[4000]) {

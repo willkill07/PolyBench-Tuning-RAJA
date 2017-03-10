@@ -2,6 +2,9 @@
 
 static __attribute__((noinline)) void init_array(int n, double A[4000][4000]) {
   int i, j;
+  if (load_init ("A", A[0], n * n))
+    return;
+
   for (i = 0; i < n; i++) {
     for (j = 0; j <= i; j++)
       A[i][j] = (double)(-j % n) / n + 1;
@@ -24,6 +27,8 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000]) {
     for (s = 0; s < n; ++s)
       A[r][s] = (*B)[r][s];
   free((void *)B);
+
+  dump_init("A", A[0], n * n);
 }
 
 

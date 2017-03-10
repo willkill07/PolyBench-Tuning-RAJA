@@ -3,12 +3,20 @@
 static __attribute__((noinline)) void init_array(int m, int n, double A[1800][2200], double x[2200]) {
   int i, j;
   double fn;
+
+  if (load_init("A", A[0], m * n) &&
+      load_init("x", x, n))
+    return;
+
   fn = (double)n;
   for (i = 0; i < n; i++)
     x[i] = 1 + (i / fn);
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++)
       A[i][j] = (double)((i + j) % n) / (5 * m);
+
+  dump_init("A", A[0], m * n);
+  dump_init("x", x, n);
 }
 
 static __attribute__ ((noinline)) void kernel_atax(int m, int n, double A[1800][2200], double x[2200], double y[2200], double tmp[1800]) {
@@ -18,7 +26,7 @@ static __attribute__ ((noinline)) void kernel_atax(int m, int n, double A[1800][
   RAJA::forall<Pol_Id_1_Size_1_Parent_null>(RAJA::RangeSegment{0, m}, [=] (int i) {
     RAJA::ReduceSum<typename Reduce<Pol_Id_2_Size_1_Parent_1>::type, double> t(0);
     RAJA::forall<Pol_Id_2_Size_1_Parent_1>(RAJA::RangeSegment{0, n}, [=] (int j) {
-	t += A[i][j] * x[j];
+        t += A[i][j] * x[j];
     });
     tmp[i] = t;
     RAJA::forall<Pol_Id_3_Size_1_Parent_1>(RAJA::RangeSegment{0, n}, [=] (int j) {

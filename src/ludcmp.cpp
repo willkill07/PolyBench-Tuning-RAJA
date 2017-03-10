@@ -2,6 +2,13 @@
 
 static __attribute__((noinline)) void init_array(int n, double A[4000][4000], double b[4000], double x[4000], double y[4000]) {
   int i, j;
+
+  if (load_init("A", A[0], n * n) &&
+      load_init("b", b, n) &&
+      load_init("x", x, n) &&
+      load_init("y", y, n))
+    return;
+
   double fn = (double)n;
   for (i = 0; i < n; i++) {
     x[i] = 0;
@@ -30,6 +37,11 @@ static __attribute__((noinline)) void init_array(int n, double A[4000][4000], do
     for (s = 0; s < n; ++s)
       A[r][s] = (*B)[r][s];
   free((void *)B);
+
+  dump_init("A", A[0], n * n);
+  dump_init("b", b, n);
+  dump_init("x", x, n);
+  dump_init("y", y, n);
 }
 
 static __attribute__ ((noinline)) void kernel_ludcmp(int n, double A[4000][4000], double b[4000], double x[4000], double y[4000]) {
@@ -60,7 +72,7 @@ static __attribute__ ((noinline)) void kernel_ludcmp(int n, double A[4000][4000]
     int i = (n - 1) - ii;
     RAJA::ReduceSum<typename Reduce<Pol_Id_8_Size_1_Parent_7>::type, double> w(0);
     RAJA::forall<Pol_Id_8_Size_1_Parent_7> (RAJA::RangeSegment{i + 1, n}, [=] (int j) {
-	w += A[i][j] * x[j];
+        w += A[i][j] * x[j];
     });
     x[i] = (y[i] - w) / A[i][i];
   });

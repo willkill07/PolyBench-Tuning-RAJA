@@ -3,9 +3,15 @@
 static __attribute__((noinline)) void init_array(int m, int n, double *float_n, double data[3000][2600]) {
   int i, j;
   *float_n = (double)n;
+
+  if (load_init ("data", data[0], m * n))
+    return;
+
   for (i = 0; i < n; i++)
     for (j = 0; j < m; j++)
       data[i][j] = ((double)i * j) / m;
+
+  dump_init ("data", data[0], m * n);
 }
 
 static __attribute__ ((noinline)) void kernel_covariance(int m, int n, double float_n, double data[3000][2600], double cov[2600][2600], double mean[2600]) {

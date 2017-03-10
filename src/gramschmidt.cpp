@@ -2,6 +2,11 @@
 
 static __attribute__((noinline)) void init_array(int m, int n, double A[2000][2600], double R[2600][2600], double Q[2000][2600]) {
   int i, j;
+  if (load_init("A", A[0], n * m) &&
+      load_init("R", R[0], n * n) &&
+      load_init("Q", Q[0], n * m))
+    return;
+
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++) {
       A[i][j] = (((double)((i * j) % m) / m) * 100) + 10;
@@ -10,6 +15,10 @@ static __attribute__((noinline)) void init_array(int m, int n, double A[2000][26
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       R[i][j] = 0.0;
+
+  dump_init("A", A[0], n * m);
+  dump_init("R", R[0], n * n);
+  dump_init("Q", Q[0], n * m);
 }
 
 static __attribute__ ((noinline)) void kernel_gramschmidt(int m, int n, double A[2000][2600], double R[2600][2600], double Q[2000][2600]) {

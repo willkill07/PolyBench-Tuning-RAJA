@@ -2,6 +2,13 @@
 
 static __attribute__((noinline)) void init_array(int tmax, int nx, int ny, double ex[2000][2600], double ey[2000][2600], double hz[2000][2600], double _fict_[1000]) {
   int i, j;
+
+  if (load_init("ex", ex[0], nx * ny) &&
+      load_init("ey", ey[0], nx * ny) &&
+      load_init("hz", hz[0], nx * ny) &&
+      load_init("_fict_", _fict_, tmax))
+    return;
+
   for (i = 0; i < tmax; i++)
     _fict_[i] = (double)i;
   for (i = 0; i < nx; i++)
@@ -10,6 +17,11 @@ static __attribute__((noinline)) void init_array(int tmax, int nx, int ny, doubl
       ey[i][j] = ((double)i * (j + 2)) / ny;
       hz[i][j] = ((double)i * (j + 3)) / nx;
     }
+
+  dump_init("ex", ex[0], nx * ny);
+  dump_init("ey", ey[0], nx * ny);
+  dump_init("hz", hz[0], nx * ny);
+  dump_init("_fict_", _fict_, tmax);
 }
 
 static __attribute__ ((noinline)) void kernel_fdtd_2d(int tmax, int nx, int ny, double ex[2000][2600], double ey[2000][2600], double hz[2000][2600], double _fict_[1000]) {

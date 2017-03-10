@@ -2,10 +2,18 @@
 
 static __attribute__((noinline)) void init_array(int n, double A[4000], double B[4000]) {
   int i;
+
+  if (load_init("A", A, n) &&
+      load_init("B", B, n))
+    return;
+
   for (i = 0; i < n; i++) {
     A[i] = ((double)i + 2) / n;
     B[i] = ((double)i + 3) / n;
   }
+
+  dump_init("A", A, n);
+  dump_init("B", B, n);
 }
 
 static __attribute__ ((noinline)) void kernel_jacobi_1d(int tsteps, int n, double A[4000], double B[4000]) {

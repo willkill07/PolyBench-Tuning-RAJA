@@ -4,6 +4,17 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
   int i, j;
   *alpha = 1.5;
   *beta = 1.2;
+  if (load_init("A", A[0], n * n) &&
+      load_init("u1", u1, n) &&
+      load_init("v1", v1, n) &&
+      load_init("u2", u2, n) &&
+      load_init("v2", v2, n) &&
+      load_init("w", w, n) &&
+      load_init("x", x, n) &&
+      load_init("y", y, n) &&
+      load_init("z", z, n))
+    return;
+
   double fn = (double)n;
   for (i = 0; i < n; i++) {
     u1[i] = i;
@@ -17,6 +28,16 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
     for (j = 0; j < n; j++)
       A[i][j] = (double)(i * j % n) / n;
   }
+
+  dump_init("A", A[0], n * n);
+  dump_init("u1", u1, n);
+  dump_init("v1", v1, n);
+  dump_init("u2", u2, n);
+  dump_init("v2", v2, n);
+  dump_init("w", w, n);
+  dump_init("x", x, n);
+  dump_init("y", y, n);
+  dump_init("z", z, n);
 }
 
 static __attribute__ ((noinline)) void kernel_gemver(int n, double alpha, double beta, double A[4000][4000], double u1[4000], double v1[4000], double u2[4000], double v2[4000], double w[4000], double x[4000], double y[4000], double z[4000]) {

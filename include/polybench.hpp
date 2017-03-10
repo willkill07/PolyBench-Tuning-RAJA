@@ -16,6 +16,10 @@
 
 #include <RAJA/RAJA.hxx>
 
+#ifndef DEFAULT_DATA_READ_PATH
+#define DEFAULT_DATA_PATH "/home/wkillian/defaults/"
+#endif
+
 #ifndef AUTOTUNING
 
 using Pol_Id_0_Size_1_Parent_null = RAJA::seq_exec;
@@ -100,6 +104,39 @@ static __attribute__((noinline)) void dump (const char* tag, T* data, size_t ele
   fwrite(data, sizeof(T), elems, fp);
   fclose(fp);
   fp = NULL;
+}
+
+template <typename T>
+static __attribute__((noinline)) void dump_init (const char* tag, T* data, size_t elems) {
+  char filename[256];
+  char* demangledType = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+  snprintf(filename, 256, DEFAULT_DATA_PATH "%s-%s-%s-%zu.bin", __BASE_FILE__, demangledType, tag, elems);
+  free(demangledType);
+  demangledType = NULL;
+  FILE* fp = fopen(filename, "wb");
+  if (!fp) {
+    std::cerr << filename << std::endl;
+  }
+  fwrite(data, sizeof(T) * elems, 1, fp);
+  fclose(fp);
+  fp = NULL;
+}
+
+template <typename T>
+static __attribute__((noinline)) bool load_init (const char* tag, T* data, size_t elems) {
+  char filename[256];
+  char* demangledType = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+  snprintf(filename, 256, DEFAULT_DATA_PATH "%s-%s-%s-%zu.bin", __BASE_FILE__, demangledType, tag, elems);
+  free(demangledType);
+  demangledType = NULL;
+  FILE* fp = fopen(filename, "rb");
+  if (!fp) {
+    return false;
+  }
+  fread(data, sizeof(T) * elems, 1, fp);
+  fclose(fp);
+  fp = NULL;
+  return true;
 }
 
 #endif

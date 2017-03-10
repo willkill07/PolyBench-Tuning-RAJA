@@ -3,9 +3,15 @@
 static __attribute__((noinline)) void init_array(int w, int h, float *alpha, float imgIn[7680][4320]) {
   int i, j;
   *alpha = 0.25;
+
+  if (load_init("imgIn", imgIn[0], w * h))
+    return;
+
   for (i = 0; i < w; i++)
     for (j = 0; j < h; j++)
       imgIn[i][j] = (float)((313 * i + 991 * j) % 65536) / 65535.0f;
+
+  dump_init("imgIn", imgIn[0], w * h);
 }
 
 static __attribute__ ((noinline)) void kernel_deriche(int w, int h, float alpha, float imgIn[7680][4320], float imgOut[7680][4320], float y1[7680][4320], float y2[7680][4320]) {

@@ -4,12 +4,20 @@ typedef char base;
 
 static __attribute__((noinline)) void init_array(int n, base seq[5500], int table[5500][5500]) {
   int i, j;
+
+  if (load_init("seq", seq, n) &&
+      load_init("table", table[0], n * n))
+    return;
+
   for (i = 0; i < n; i++) {
     seq[i] = (base)((i + 1) % 4);
   }
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       table[i][j] = 0;
+
+  dump_init("seq", seq, n);
+  dump_init("table", table[0], n * n);
 }
 
 static __attribute__ ((noinline)) void kernel_nussinov(int n, base seq[5500], int table[5500][5500]) {

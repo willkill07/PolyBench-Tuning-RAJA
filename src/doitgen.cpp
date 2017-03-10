@@ -2,6 +2,11 @@
 
 static __attribute__((noinline)) void init_array(int nr, int nq, int np, double A[250][220][270], double C4[270][270]) {
   int i, j, k;
+
+  if (load_init("A", A[0][0], nr * nq * np) &&
+      load_init("C4", C4[0], np * np))
+    return;
+
   for (i = 0; i < nr; i++)
     for (j = 0; j < nq; j++)
       for (k = 0; k < np; k++)
@@ -9,6 +14,9 @@ static __attribute__((noinline)) void init_array(int nr, int nq, int np, double 
   for (i = 0; i < np; i++)
     for (j = 0; j < np; j++)
       C4[i][j] = (double)(i * j % np) / np;
+
+  dump_init("A", A[0][0], nr * nq * np);
+  dump_init("C4", C4[0], np * np);
 }
 
 

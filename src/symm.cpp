@@ -4,6 +4,12 @@ static __attribute__((noinline)) void init_array(int m, int n, double *alpha, do
   int i, j;
   *alpha = 1.5;
   *beta = 1.2;
+
+  if(load_init("C", C[0], m * n) &&
+     load_init("B", B[0], m * n) &&
+     load_init("A", A[0], m * m))
+    return;
+
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++) {
       C[i][j] = (double)((i + j) % 100) / m;
@@ -15,6 +21,10 @@ static __attribute__((noinline)) void init_array(int m, int n, double *alpha, do
     for (j = i + 1; j < m; j++)
       A[i][j] = -999;
   }
+
+  dump_init("C", C[0], m * n);
+  dump_init("B", B[0], m * n);
+  dump_init("A", A[0], m * m);
 }
 
 static __attribute__ ((noinline)) void kernel_symm(int m, int n, double alpha, double beta, double C[2000][2600], double A[2000][2000], double B[2000][2600]) {

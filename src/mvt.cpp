@@ -2,6 +2,14 @@
 
 static __attribute__((noinline)) void init_array(int n, double x1[4000], double x2[4000], double y_1[4000], double y_2[4000], double A[4000][4000]) {
   int i, j;
+
+  if (load_init("x1", x1, n) &&
+      load_init("x2", x2, n) &&
+      load_init("y_1", y_1, n) &&
+      load_init("y_2", y_2, n) &&
+      load_init("A", A[0], n * n))
+    return;
+
   for (i = 0; i < n; i++) {
     x1[i] = (double)(i % n) / n;
     x2[i] = (double)((i + 1) % n) / n;
@@ -10,6 +18,12 @@ static __attribute__((noinline)) void init_array(int n, double x1[4000], double 
     for (j = 0; j < n; j++)
       A[i][j] = (double)(i * j % n) / n;
   }
+
+  dump_init("x1", x1, n);
+  dump_init("x2", x2, n);
+  dump_init("y_1", y_1, n);
+  dump_init("y_2", y_2, n);
+  dump_init("A", A[0], n * n);
 }
 
 static __attribute__ ((noinline)) void kernel_mvt(int n, double x1[4000], double x2[4000], double y_1[4000], double y_2[4000], double A[4000][4000]) {

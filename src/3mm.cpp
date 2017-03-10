@@ -2,6 +2,12 @@
 
 static __attribute__((noinline)) void init_array(int ni, int nj, int nk, int nl, int nm, double A[1600][2000], double B[2000][1800], double C[1800][2400], double D[2400][2200]) {
   int i, j;
+  if (load_init ("A", A[0], ni * nk) &&
+      load_init ("B", B[0], nk * nj) &&
+      load_init ("C", C[0], nj * nm) &&
+      load_init ("D", D[0], nm * nl))
+    return;
+
   for (i = 0; i < ni; i++)
     for (j = 0; j < nk; j++)
       A[i][j] = (double)((i * j + 1) % ni) / (5 * ni);
@@ -14,6 +20,11 @@ static __attribute__((noinline)) void init_array(int ni, int nj, int nk, int nl,
   for (i = 0; i < nm; i++)
     for (j = 0; j < nl; j++)
       D[i][j] = (double)((i * (j + 2) + 2) % nk) / (5 * nk);
+
+  dump_init ("A", A[0], ni * nk);
+  dump_init ("B", B[0], nk * nj);
+  dump_init ("C", C[0], nj * nm);
+  dump_init ("D", D[0], nm * nl);
 }
 
 static __attribute__ ((noinline)) void kernel_3mm(int ni, int nj, int nk, int nl, int nm, double E[1600][1800], double A[1600][2000], double B[2000][1800], double F[1800][2200], double C[1800][2400], double D[2400][2200], double G[1600][2200]) {

@@ -4,6 +4,12 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
   int i, j;
   *alpha = 1.5;
   *beta = 1.2;
+
+  if(load_init("A", A[0], n * n) &&
+     load_init("B", B[0], n * n) &&
+     load_init("x", x, n))
+    return;
+
   for (i = 0; i < n; i++) {
     x[i] = (double)(i % n) / n;
     for (j = 0; j < n; j++) {
@@ -11,6 +17,10 @@ static __attribute__((noinline)) void init_array(int n, double *alpha, double *b
       B[i][j] = (double)((i * j + 2) % n) / n;
     }
   }
+
+  dump_init("A", A[0], n * n);
+  dump_init("B", B[0], n * n);
+  dump_init("x", x, n);
 }
 
 static __attribute__ ((noinline)) void kernel_gesummv(int n, double alpha, double beta, double A[2800][2800], double B[2800][2800], double tmp[2800], double x[2800], double y[2800]) {

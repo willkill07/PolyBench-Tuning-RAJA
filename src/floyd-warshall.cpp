@@ -2,12 +2,18 @@
 
 static __attribute__((noinline)) void init_array(int n, int path[5600][5600]) {
   int i, j;
+
+  if (load_init("path", path[0], n * n))
+    return;
+
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++) {
       path[i][j] = i * j % 7 + 1;
       if ((i + j) % 13 == 0 || (i + j) % 7 == 0 || (i + j) % 11 == 0)
         path[i][j] = 999;
     }
+
+  dump_init("path", path[0], n * n);
 }
 
 static __attribute__ ((noinline)) void kernel_floyd_warshall(int n, int path[5600][5600]) {

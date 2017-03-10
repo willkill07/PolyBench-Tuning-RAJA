@@ -3,9 +3,15 @@
 static __attribute__((noinline)) void init_array(int m, int n, double *float_n, double data[3000][2600]) {
   int i, j;
   *float_n = (double)m;
+
+  if (load_init ("data", data[0], m * n))
+    return;
+
   for (i = 0; i < m; i++)
     for (j = 0; j < n; j++)
       data[i][j] = (double)(i * j) / n + i;
+
+  dump_init ("data", data[0], m * n);
 }
 
 static __attribute__ ((noinline)) void kernel_correlation(int m, int n, double float_n, double data[3000][2600], double corr[2600][2600], double mean[2600], double stddev[2600]) {

@@ -2,12 +2,22 @@
 
 static __attribute__((noinline)) void init_array(int n, double L[4000][4000], double x[4000], double b[4000]) {
   int i, j;
+
+  if (load_init("L", L[0], n * n) &&
+      load_init("x", x, n) &&
+      load_init("b", b, n))
+    return;
+
   for (i = 0; i < n; i++) {
     x[i] = -999;
     b[i] = i;
     for (j = 0; j <= i; j++)
       L[i][j] = (double)(i + n - j + 1) * 2 / n;
   }
+
+  dump_init("L", L[0], n * n);
+  dump_init("x", x, n);
+  dump_init("b", b, n);
 }
 
 static __attribute__((noinline)) void kernel_trisolv(int n, double L[4000][4000], double x[4000], double b[4000]) {

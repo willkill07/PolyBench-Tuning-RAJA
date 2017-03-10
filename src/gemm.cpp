@@ -4,6 +4,11 @@ static __attribute__((noinline)) void init_array(int ni, int nj, int nk, double 
   int i, j;
   *alpha = 1.5;
   *beta = 1.2;
+  if (load_init("A", A[0], ni * nk) &&
+      load_init("B", B[0], nj * nk) &&
+      load_init("C", C[0], ni * nj))
+    return;
+
   for (i = 0; i < ni; i++)
     for (j = 0; j < nj; j++)
       C[i][j] = (double)((i * j + 1) % ni) / ni;
@@ -13,6 +18,10 @@ static __attribute__((noinline)) void init_array(int ni, int nj, int nk, double 
   for (i = 0; i < nk; i++)
     for (j = 0; j < nj; j++)
       B[i][j] = (double)(i * (j + 2) % nj) / nj;
+
+  dump_init("A", A[0], ni * nk);
+  dump_init("B", B[0], nj * nk);
+  dump_init("C", C[0], ni * nj);
 }
 
 static __attribute__ ((noinline)) void kernel_gemm(int ni, int nj, int nk, double alpha, double beta, double C[2000][2300], double A[2000][2600], double B[2600][2300]) {

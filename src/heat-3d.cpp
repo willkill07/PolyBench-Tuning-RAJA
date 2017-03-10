@@ -2,12 +2,18 @@
 
 static __attribute__((noinline)) void init_array(int n, double A[200][200][200], double B[200][200][200]) {
   int i, j, k;
+  if (load_init("A", A[0][0], n * n * n) &&
+      load_init("B", B[0][0], n * n * n))
+    return;
+
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++)
       for (k = 0; k < n; k++)
         A[i][j][k] = B[i][j][k] = (double)(i + j + (n - k)) * 10 / (n);
-}
 
+  dump_init("A", A[0][0], n * n * n);
+  dump_init("B", B[0][0], n * n * n);
+}
 
 static __attribute__ ((noinline)) void kernel_heat_3d(int tsteps, int n, double A[200][200][200], double B[200][200][200]) {
   for (int t = 1; t <= tsteps; t++) {

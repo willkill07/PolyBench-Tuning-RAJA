@@ -2,10 +2,16 @@
 
 static __attribute__((noinline)) void init_array(int n, double u[2000][2000]) {
   int i, j;
+
+  if (load_init ("u", u[0], n * n))
+    return;
+
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++) {
       u[i][j] = (double)(i + n - j) / n;
     }
+
+  dump_init ("u", u[0], n * n);
 }
 
 static __attribute__ ((noinline)) void kernel_adi(int tsteps, int n, double u[2000][2000], double v[2000][2000], double p[2000][2000], double q[2000][2000]) {

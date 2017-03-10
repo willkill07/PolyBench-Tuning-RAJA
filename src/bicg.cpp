@@ -2,6 +2,12 @@
 
 static __attribute__((noinline)) void init_array(int m, int n, double A[2200][1800], double r[2200], double p[1800]) {
   int i, j;
+
+  if (load_init("A", A[0], m * n) &&
+      load_init("r", r, n) &&
+      load_init("p", p, m))
+    return;
+
   for (i = 0; i < m; i++)
     p[i] = (double)(i % m) / m;
   for (i = 0; i < n; i++) {
@@ -9,6 +15,10 @@ static __attribute__((noinline)) void init_array(int m, int n, double A[2200][18
     for (j = 0; j < m; j++)
       A[i][j] = (double)(i * (j + 1) % n) / n;
   }
+
+  dump_init("A", A[0], m * n);
+  dump_init("r", r, n);
+  dump_init("p", p, m);
 }
 
 static __attribute__ ((noinline)) void kernel_bicg(int m, int n, double A[2200][1800], double s[1800], double q[2200], double p[1800], double r[2200]) {

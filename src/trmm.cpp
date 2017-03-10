@@ -3,6 +3,11 @@
 static __attribute__((noinline)) void init_array(int m, int n, double *alpha, double A[2000][2000], double B[2000][2600]) {
   int i, j;
   *alpha = 1.5;
+
+  if(load_init("A", A[0], m * m) &&
+     load_init("B", B[0], m * n))
+    return;
+
   for (i = 0; i < m; i++) {
     for (j = 0; j < i; j++) {
       A[i][j] = (double)((i + j) % m) / m;
@@ -12,6 +17,9 @@ static __attribute__((noinline)) void init_array(int m, int n, double *alpha, do
       B[i][j] = (double)((n + (i - j)) % n) / n;
     }
   }
+
+  dump_init("A", A[0], m * m);
+  dump_init("B", B[0], m * n);
 }
 
 static __attribute__ ((noinline)) void kernel_trmm(int m, int n, double alpha, double A[2000][2000], double B[2000][2600]) {
