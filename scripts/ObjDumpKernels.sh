@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+match=$1
+shift
 
 objdump -d $@ \
-| awk '
-/^[[:xdigit:]]+ <[^>]*kernel[^>]*>:$/{
+| awk "
+/^[[:xdigit:]]+ <[^>]*${match}[^>]*>:$/{
   flag=1
   print
   next
@@ -10,7 +12,7 @@ objdump -d $@ \
 /^[[:xdigit:]]+ <.*>:$/{
   flag=0
 }
-flag' \
+flag" \
 | sed -r '
 s/^0+([0-9a-f]+)/\1/
 s/ +#.*$//;s/^ +//

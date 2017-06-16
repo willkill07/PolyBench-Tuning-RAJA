@@ -3,7 +3,9 @@
 #include <iostream>
 #include <regex>
 
-std::regex FILENAME_PARSE{R"((double|int|float|long)-[^-]+-(\d+).bin)", std::regex::optimize};
+#include <cstdio>
+
+static const std::regex FILENAME_PARSE{R"((double|int|float|long)-[^-]+-(\d+).bin)", std::regex::optimize};
 
 std::pair<std::string, size_t>
 getInformation(const std::string& filename) {
@@ -34,15 +36,16 @@ struct Error {
   Error()             = default;
   Error(const Error&) = default;
   Error(Error&&)      = default;
+  Error& operator=(const Error&) = default;
 
   template <typename T>
-  Error(std::unique_ptr<T[]> base, std::unique_ptr<T[]> obs, size_t size) {
-    absolute = 0.0;
-    absolute_max = 0.0;
-    relative = 1.0;
-    relative_max = 0.0;
-    count = size;
-
+  Error(std::unique_ptr<T[]> base, std::unique_ptr<T[]> obs, size_t size) :
+    absolute{0.0},
+    absolute_max{0.0},
+    relative{1.0},
+    relative_max{0.0},
+    count{size}
+  {
     for (size_t i = 0; i < size; ++i) {
       double absdiff = std::abs(obs[i] - base[i]);
       absolute += (absdiff * absdiff);
@@ -66,23 +69,22 @@ struct Error {
     absolute = std::sqrt(absolute);
     relative = std::pow(relative, 1.0 / count);
   }
-};
 
-std::ostream&
-operator<< (std::ostream &os, const Error& e) {
-  return (os << "Absolute (norm2(absdiff)): " << e.absolute << '\n'
-          << "Relative (geo(ratio)): " << e.relative << '\n'
-          << "Max Absolute difference: " << e.absolute_max << '\n'
-          << "Max Ratio: " << e.relative_max << '\n'
-          << "Elements: " << e.count);
-}
+  void print() const {
+    printf("\"%s\":%g, \"%s\":%g, \"%s\":%g, \"%s\":%g, \"%s\":%lu",
+           "absolute", absolute, "relative", relative, "max_absolute", absolute_max,
+           "max_ratio", relative_max, "elements", count);
+  }
+};
 
 int main(int argc, char* argv[]) {
   if (argc == 1 || (argc & 1) == 0) {
     std::cerr << "Usage: " << argv[0] << " [ <baseline> <observed> ]+\n";
     return EXIT_FAILURE;
   }
-
+  std::vector<Error> errors;
+  Error result;
+  puts("{\"individual\": [");
   for (int i = 1; i < argc; i += 2) {
     const char* file1     = argv[i];
     const char* file2     = argv[i + 1];
@@ -94,7 +96,6 @@ int main(int argc, char* argv[]) {
       return EXIT_FAILURE;
     }
 
-    std::vector<Error> errors;
     std::string        dataType = std::get<0>(file1info);
     size_t             dataSize = std::get<1>(file1info);
     switch (dataType[0]) {
@@ -108,18 +109,17 @@ int main(int argc, char* argv[]) {
         errors.emplace_back(read<double>(file1, dataSize), read<double>(file2, dataSize), dataSize);
         break;
     }
-
-    std::cout.precision(9);
-    std::cout << std::fixed;
-
-    Error result;
-    for (Error& e : errors) {
-      result += e;
-      e.finalize();
-      std::cout << "--------------------" << '\n' << e << std::endl;
-    }
-    result.finalize();
-    std::cout << "====================" << '\n' << result << std::endl;
+    result += errors.back();
+    errors.back().finalize();
+    printf("{\"expected\":\"%s\", \"actual\":\"%s\", \"data_type\":\"%s\", ", file1, file2, dataType.c_str());
+    errors.back().print();
+    putchar('}');
+    if (i + 2 < argc)
+      puts(",");
   }
+  puts("], \"aggregated\": {");
+  result.finalize();
+  result.print();
+  puts("}}");
   return EXIT_SUCCESS;
 }

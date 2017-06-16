@@ -1,67 +1,77 @@
 #!/usr/bin/env python3
 import re
+import sys
+import pprint
+
 from collections import OrderedDict
 from collections import defaultdict
 
 def generateWPCFG(asmFile):
-    
+
     code=OrderedDict()
     calls=OrderedDict()
     links=defaultdict(set)
-    
+
     functions=set()
-    breakpoints=set()
     returns=set()
-    
-    with open(asmFile) as file:
-        # previous instruction is used for conditional branching to add a link to if branch not taken
-        prev = None
-        
-        newFunctionBlock = True
-        for line in file:
+
+
+    with open(asmFile) as asm_file:
+        new_function_block = True
+        prev_address_cjump = None
+        for line in asm_file:
+
             line = line.rstrip('\n')
-            split = re.split("[\t :,]+", line)
-            # check if we are encountering a new block (function)
-            if newFunctionBlock:
-                newFunctionBlock = False
-                functions.add(split[0])
+            split_line = re.split("[\t :,]+", line)
+
+            if new_function_block:
+                new_function_block = False
+                functions.add(split_line[0])
             elif len(line) == 0:
-                # encounter empty line -- expect a new function block
-                newFunctionBlock = True
+                new_function_block = True
                 continue
-                
-            # rename accesses to make sense
-            address, instr, args = split[0], split[1], split[2:]
-            
-            # insert into code lookup
+            address, instr, args = split_line[0], split_line[1], split_line[2:]
+
             code[address] = (instr, args)
-            # if we have a previous instruction set from a conditional jump, add the link from prev->address
-            if prev:
-                links[prev].add(address)
-            prev = None
-            if instr.startswith("ret"): # handle returns
+
+            # if prior instruction was conditional jump, make the Branch-Not-Taken link
+            if prev_address_cjump:
+                links[prev_address_cjump].add(address)
+            prev_address_cjump = None
+
+            # handle ret
+            if instr.startswith("ret"):
                 returns.add(address)
-            elif instr.startswith('jmp'): # and unconditional jumps
+            # and the elusive rep ret
+            elif instr == "rep" and args[0] == "ret":
+                returns.add(address)
+            # unconditional jumps
+            elif instr.startswith('jmp'):
                 links[address].add(args[0])
-            elif instr[0] == 'j': # and conditional jumps
+            # and conditional jumps, too
+            elif instr.startswith('j'):
                 links[address].add(args[0])
-                prev = address
-            elif instr.startswith('call'): # be intelligent with calls
+                prev_address_cjump = address
+            # finally, calls
+            elif instr.startswith('call'):
                 calls[address] = args
-    
+
     for address in calls:
         if calls[address][0] in functions:
             calls[address] = calls[address][0]
             continue
+        print(calls[address])
+        if len(calls[address]) < 2:
+            continue
         # Resolve GOMP_parallel call to function
-        if "GOMP_parallel" in calls[address][1]:
+        if "GOMP_parallel" in calls[address][1] or "__kmpc_fork_call" in calls[address][1]:
             if not address in list(code.keys()):
                 calls[address] = None
                 continue
             index = list(code.keys()).index(address) - 1
-            reversedInstr = reversed(list(code.items())[0:index])
+            reversed_instr = reversed(list(code.items())[0:index])
             found = False
-            for backAddress,args in reversedInstr:
+            for _,args in reversed_instr:
                 # if we reach another call give up on resolving
                 if 'call' in args[0]:
                     calls[address] = None
@@ -77,42 +87,46 @@ def generateWPCFG(asmFile):
             if found:
                 continue
         calls[address] = None
-    
+
     # establish a list of all possible divergent locations
-    targetBreaks = {address for targets in links.values() for address in targets}
-    jumpBreaks = {addr[0] for addr in links}
+    target_breaks = {address for targets in links.values() for address in targets}
+    jump_breaks = {addr[0] for addr in links}
 
     # add all calls to resolved links
     for call in calls:
-        if calls[call]:
+        if calls[call] and type(calls[call]) is not list:
             links[call].add(calls[call])
-    
+
     # construct basic blocks
-    currBlock=[]
-    basicBlocks={}
-    prevLast = None
+    curr_block=[]
+    basic_blocks={}
+    prev_last = None
     # iterate over each instruction in our code
-    for c in code:
+    for curr in code:
         # functions get their own basic block start
-        if c in functions:
-            if len(currBlock) > 0:
-                basicBlocks[currBlock[0]] = currBlock
-            currBlock = []
-        currBlock.append(c)
+        if curr in functions:
+            if len(curr_block) > 0:
+                basic_blocks[curr_block[0]] = curr_block
+            curr_block = []
+        curr_block.append(curr)
         # so do any observed breakpoints (jump targets)
-        if c in jumpBreaks or c in returns:
-            basicBlocks[currBlock[0]] = currBlock
-            currBlock = []
+        if curr in jump_breaks or curr in returns:
+            basic_blocks[curr_block[0]] = curr_block
+            curr_block = []
         # and so do targets of jumps!
-        if c in targetBreaks:
-            inst = code[prevLast][0]
-            if not 'call' in inst and not 'ret' in inst and 'j' != inst[0]:
-                links[prevLast].add(c)
-            basicBlocks[currBlock[0]] = currBlock
-            currBlock = []
-        prevLast = c
-    if len(currBlock) > 0:
-        basicBlocks[currBlock[0]] = currBlock
-        
-        
-    return {"links":links,"bb":basicBlocks,"code":code}
+        elif curr in target_breaks:
+            # this should not be necessary
+            #    inst = code[prev_last][0]
+            #    if not 'call' in inst and not 'ret' in inst and 'j' != inst[0]:
+            links[prev_last].add(curr)
+            basic_blocks[curr_block[0]] = curr_block
+            curr_block = []
+        prev_last = curr
+    if len(curr_block) > 0:
+        basic_blocks[curr_block[0]] = curr_block
+
+    return {"links" : links, "bb" : basic_blocks, "code" : code}
+
+if __name__ == "__main__":
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(generateWPCFG(sys.argv[1]))

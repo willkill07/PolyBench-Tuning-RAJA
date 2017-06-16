@@ -11,7 +11,7 @@ do
     output=$(echo $binary | sed 's/out/asm/')
     if [[ ! -f ${output} ]]
     then
-        mkdir -p $(dirname $output)
-        ./scripts/ObjDumpKernels.sh ${binary} > ${output}
+        mkdir -p $(dirname "${output}")
+        ./scripts/ObjDumpKernels.sh kernel ${binary} > ${output}
     fi
 done
